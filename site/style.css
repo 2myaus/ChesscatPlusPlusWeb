@@ -1,0 +1,69 @@
+.board{
+    width: min-content;
+    display:flex;
+    flex-direction: column-reverse;
+    --dark-color: #444;
+    --light-color: #aaa;
+    border: 4px solid black;
+}
+
+.board > .row{
+    display: flex;
+    flex-direction: row;
+    height:min-content;
+}
+
+.board.flipped{
+    flex-direction: column;
+}
+
+.board.flipped > .row{
+    flex-direction: row-reverse;
+}
+
+.board .square{
+    width: 100px;
+    height:100px;
+    position:sticky;
+}
+
+.board .square > img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.board > .row:nth-child(even){
+    background-color: var(--dark-color);
+}
+
+.board > .row:nth-child(even) > .square:nth-child(odd){
+    background-color: var(--light-color);
+}
+
+.board > .row:nth-child(odd){
+    background-color: var(--dark-color);
+}
+
+.board > .row:nth-child(odd) > .square:nth-child(even){
+    background-color: var(--light-color);
+}
+
+.square.target::after{
+    content:"";
+    background-color: #00000080;
+    display: block;
+    width:100%;
+    height:100%;
+}
+
+.square.possible-move::after{
+    content:"";
+    background-color: #ff000080;
+    display: block;
+    width:100%;
+    height:100%;
+}
