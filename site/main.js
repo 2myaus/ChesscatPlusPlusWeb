@@ -1,5 +1,9 @@
 const board = document.getElementsByClassName("board")[0];
 
+function samesquare(s1, s2){
+    return (s1[0] == s2[0]) && (s1[1] = s1[1]);
+}
+
 function getSquare(row, col){
     return board.children[row].children[col];
 }
@@ -8,10 +12,7 @@ function getSquarePosition(square_elem){
     let col = Array.from(square_elem.parentElement.children).indexOf(square_elem);
     let row = Array.from(square_elem.parentElement.parentElement.children).indexOf(square_elem.parentElement);
 
-    return {
-        row: row,
-        col: col
-    };
+    return [row, col];
 }
 
 function getSquareParent(elem){
@@ -124,10 +125,12 @@ function setTargetSquare(square){
         possible_move_squares.forEach((square) => {
             square.classList.remove("possible-move");
         });
-        let moves = game.getLegalMovesFromSquare([squarePos.row, squarePos.col]);
+        let moves = game.getLegalMovesFromSquare(squarePos);
         for(let i = 0; i < moves.getNumMoves(); i++){
-            let move = moves.getMoveAt(i);
-            getSquare(move[1][0], move[1][1]).classList.add("possible-move");
+            const move = moves.getMoveAt(i);
+            const origin = move.getOrigin();
+            const destination = move.getDestination();
+            getSquare(destination[0], destination[1]).classList.add("possible-move");
         }
         moves.delete();
     }
@@ -148,11 +151,18 @@ function clickSquare(square){
         if(square_from){
             square_to_pos = getSquarePosition(square);
             square_from_pos = getSquarePosition(square_from);
-            const move = [
-                [square_from_pos.row, square_from_pos.col],
-                [square_to_pos.row, square_to_pos.col]
-            ];
-            game.playMove(move, Module.PieceType.Queen);
+            let move;
+            const moves = game.getLegalMovesFromSquare(square_from_pos);
+            for(let i = 0; i < moves.getNumMoves(); i++){
+                const m = moves.getMoveAt(i);
+                const origin = m.getOrigin();
+                const destination = m.getDestination();
+                if(samesquare(destination, square_to_pos)){
+                    move = m;
+                }
+            }
+            if(!move){throw "Move not found!";}
+            game.playMove(move);
             setTargetSquare(null);
             refreshBoardPieces();
         }

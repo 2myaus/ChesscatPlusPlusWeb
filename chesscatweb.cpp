@@ -5,10 +5,6 @@ using namespace emscripten;
 
 using namespace chesscat;
 
-int add(int a, int b){
-    return a + b;
-}
-
 class MoveIterator{
     private:
         std::vector<Move> moves;
@@ -24,12 +20,20 @@ class MoveIterator{
 
 MoveIterator getLegalMovesFromSquareOnPosition(Position &pos, Square square){
     std::vector<Move> moves;
-    pos.iterateLegalMovesFromSquare(square, [&moves, &square](Square to) -> chesscat::internal::MoveIterationResult{
-        moves.push_back({.from = square, .to = to});
+    pos.iterateLegalMovesFromSquare(square, [&moves](Move move) -> chesscat::internal::MoveIterationResult{
+        moves.push_back(move);
         return chesscat::internal::ContinueMoveIteration;
     });
     MoveIterator iterator(moves);
     return iterator;
+}
+
+Square getOriginSquare(Move &move){
+    return move.getAction(0).square0;
+}
+
+Square getDestinationSquare(Move &move){
+    return move.getAction(0).square1;
 }
 
 EMSCRIPTEN_BINDINGS(my_module){
@@ -54,15 +58,15 @@ EMSCRIPTEN_BINDINGS(my_module){
         .element(&Square::row)
         .element(&Square::col)
         ;
-    value_array<Move>("Move")
-        .element(&Move::from)
-        .element(&Move::to)
-        ;
     enum_<PositionState>("PositionState")
         .value("Normal", Normal)
         .value("Check", Check)
         .value("Checkmate", Checkmate)
         .value("Stalemate", Stalemate)
+        ;
+    class_<Move>("Move")
+        .function("getOrigin", &getOriginSquare)
+        .function("getDestination", &getDestinationSquare)
         ;
     class_<Board>("Board")
         .constructor<>()
