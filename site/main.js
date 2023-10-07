@@ -1,7 +1,7 @@
 const board = document.getElementsByClassName("board")[0];
 
 function samesquare(s1, s2){
-    return (s1[0] == s2[0]) && (s1[1] = s1[1]);
+    return ((s1[0] == s2[0]) && (s1[1] == s2[1]));
 }
 
 function getSquare(row, col){
@@ -161,6 +161,7 @@ function clickSquare(square){
                     move = m;
                 }
             }
+            moves.delete();
             if(!move){throw "Move not found!";}
             game.playMove(move);
             setTargetSquare(null);
